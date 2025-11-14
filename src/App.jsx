@@ -2,8 +2,9 @@ import React, { useMemo, useState } from "react";
 
 /**
  * CTS – Custom Truck Service F250 Customizer
- * --------------------------------------------
- * Paths assume PNGs in /public/imgs/f250. Replace placeholders with your real images.
+ * -------------------------------------------------
+ * Transparent PNGs should live in /public/imgs/f250.
+ * The logo file /public/cts-logo.png is used in the header.
  */
 
 const ASSET_MAP = {
@@ -53,17 +54,30 @@ export default function CTSCustomizer() {
   const activePack = accessories.workbox ? "workbox" : "base";
   const currentImage = useMemo(() => ASSET_MAP[activePack][view], [activePack, view]);
 
-  const toggleAccessory = (key) => setAccessories((p) => ({ ...p, [key]: !p[key] }));
+  const toggleAccessory = (key) =>
+    setAccessories((prev) => ({ ...prev, [key]: !prev[key] }));
 
   return (
     <div className="min-h-screen w-full bg-neutral-100 text-neutral-900">
+      {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-neutral-200">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="h-9 w-9 rounded-2xl bg-black text-white grid place-items-center font-bold">CTS</span>
+            <img
+              src="/cts-logo.png"
+              alt="CTS Logo"
+              className="h-8 w-auto object-contain"
+              onError={(e) => {
+                // graceful fallback to text if image missing
+                e.target.outerHTML =
+                  '<span class="h-9 w-9 rounded-2xl bg-black text-white grid place-items-center font-bold">CTS</span>';
+              }}
+            />
             <div>
-              <h1 className="text-xl font-semibold leading-none">F‑250 Customizer</h1>
-              <p className="text-xs text-neutral-500">Switch views • Toggle accessories</p>
+              <h1 className="text-xl font-semibold leading-none">Truck Customizer</h1>
+              <p className="text-xs text-neutral-500">
+                Switch views • Toggle accessories
+              </p>
             </div>
           </div>
         </div>
@@ -128,7 +142,9 @@ export default function CTSCustomizer() {
                   )}
                 </div>
                 <p className="text-xs text-neutral-500 mt-0.5">
-                  {key === "workbox" ? "Swap to utility bed in all views." : "Select to include in build sheet (no visual yet)."}
+                  {key === "workbox"
+                    ? "Swap to utility bed in all views."
+                    : "Select to include in build sheet (no visual yet)."}
                 </p>
               </div>
             </label>
@@ -146,15 +162,23 @@ export default function CTSCustomizer() {
 }
 
 function BuildSheet({ accessories, activePack, view }) {
-  const selected = Object.entries(accessories).filter(([, v]) => v).map(([k]) => k);
+  const selected = Object.entries(accessories)
+    .filter(([, v]) => v)
+    .map(([k]) => k);
 
   return (
     <div>
       <h3 className="text-base font-semibold mb-2">Build Sheet</h3>
       <ul className="text-sm text-neutral-700 space-y-1">
-        <li><span className="font-medium">Body:</span> Ford F‑250 Super Duty (single cab)</li>
-        <li><span className="font-medium">View:</span> {VIEW_LABEL[view]}</li>
-        <li><span className="font-medium">Visual Pack:</span> {activePack}</li>
+        <li>
+          <span className="font-medium">Body:</span> Ford F-250 Super Duty (single cab)
+        </li>
+        <li>
+          <span className="font-medium">View:</span> {VIEW_LABEL[view]}
+        </li>
+        <li>
+          <span className="font-medium">Visual Pack:</span> {activePack}
+        </li>
         <li className="pt-1">
           <span className="font-medium">Accessories:</span>
           {selected.length === 0 ? (
